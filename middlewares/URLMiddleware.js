@@ -8,7 +8,7 @@ export async function URLValidação(req, res, next) {
         url: joi.string().min(1).required()
     });
     const validation = clientSchema.validate(novaURL);
-    console.log("CHEGUEI AQUI URL");
+    
     if (validation.error) {
         res.status(400).send(validation.error.details);
         return;

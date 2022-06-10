@@ -1,10 +1,8 @@
 import { Router } from "express";
+import { userShortenGet } from "../controllers/UserController.js";
 
 const userRouter = Router();
 
-userRouter.post("/urls/shorten",);
-userRouter.get("/urls/:id",);
-userRouter.get("/urls/open/:shortUrl",);
-userRouter.delete("/urls/:id",);
+userRouter.get("/users/:id", userShortenGet);
 
 export default userRouter;

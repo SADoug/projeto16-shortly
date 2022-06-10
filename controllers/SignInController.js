@@ -5,9 +5,9 @@ import { v4 } from "uuid";
 export async function SignInCliente(req, res) {
   const { email, password } = req.body;
   const token = v4();
-  console.log(token)
   console.log(req.body);
   try {
+    console.log("cheguei aqui") //não chega aqui
     //Validação de email e senha
     const usuarioID = await db.query(`SELECT * FROM users WHERE email = $1;`, [email]);
     console.log(usuarioID.rows[0].id);
@@ -15,7 +15,6 @@ export async function SignInCliente(req, res) {
     if (usuarioID.rows === 0 || !bcrypt.compareSync(password, usuarioID.rows[0].password)) {
       return res.sendStatus(401); 
     }
-    console.log("cheguei aqui") //não chega aqui
     const result = await db.query(`
      INSERT INTO sessions ("userId", token)
           VALUES ($1,$2);

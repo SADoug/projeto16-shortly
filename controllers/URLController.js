@@ -49,7 +49,7 @@ export async function getURLId(req, res) {
       return res.sendStatus(404); // not found
     }
 
-    res.status(200).send(req.body);
+    res.status(200).send(result.rows[0]);
   } catch (error) {
     console.log(error);
     res.sendStatus(500); // internal server error
@@ -58,16 +58,17 @@ export async function getURLId(req, res) {
 
 
 
-export async function getURLId2(req, res) {
+export async function getURLIdOpen(req, res) {
   const { shortUrl } = req.params;
-  const contagem = 0;
+  let contagem = 0;
   try {
-    const result = await db.query(`SELECT * FROM shortlys WHERE shortUrl = $1`, [shortUrl]);
+    const result = await db.query(`SELECT * FROM shortlys WHERE "shortlyUrl" = $1`, [shortUrl]);
     if (result.rowCount === 0) {
       return res.sendStatus(404); // not found
     }
-    contagem++;
-    res.redirect([200], shortUrl)
+   contagem = result.rows[0].contagem + 1;
+   const contagemup = await db.query(`UPDATE shortlys SET contagem = ${contagem} WHERE "shortlyUrl" = $1`, [shortUrl]);
+    res.redirect(result.rows[0].url);
   } catch (error) {
     console.log(error);
     res.sendStatus(500); // internal server error
@@ -79,6 +80,10 @@ export async function deleteUrl(req, res){
   const { authorization } = req.headers
   const token = authorization?.replace('Bearer', '').trim()
   try{
+      const urlExiste = await db.query(`SELECT * FROM shortlys WHERE id = $1`, [urlId]); //Valida se a URL existe
+      if(urlExiste.rowCount === 0){
+          return res.sendStatus(404);
+      }
       const owner = await db.query(`
           SELECT sessions.*
           FROM sessions WHERE token = $1`
@@ -86,14 +91,14 @@ export async function deleteUrl(req, res){
       const urlExists = await db.query(`
           SELECT * FROM shortlys WHERE id = $1`
       , [urlId])
-      if(owner.rows[0].userId != urlExists.rows[0].userId) return res.sendStatus(401)
+      if(owner.rows[0].userId != urlExists.rows[0].userId) return res.sendStatus(401) //Valida se o usuário é o dono da URL
       await db.query(`
           DELETE FROM shortlys WHERE id = $1
           `
       , [urlId])
-      res.sendStatus(204)
+      res.sendStatus(204) //Sucesso
   }catch(err){
       console.log(err)
-      res.sendStatus(500)
+      res.sendStatus(500) //Erro
   }
 }

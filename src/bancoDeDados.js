@@ -1,8 +1,24 @@
 import pg from "pg";
-import "dotenv/config"
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const { Pool } = pg;
 
+const dbconfig = {
+  connectionString: process.env.DATABASE_URL,
+};
+if(process.env.NODE_ENV === "PROD") {
+  dbconfig.ssl = {
+    rejectUnauthorized: false
+  }
+}
+
+const db = new Pool(dbconfig);
+export default db
+
+
+/*
 const db = new Pool({
   host: process.env.DB_HOST,
   port: 5432,
@@ -13,4 +29,4 @@ const db = new Pool({
     rejectUnauthorized: false
   }
 });
-export default db
+export default db*/
