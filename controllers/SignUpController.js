@@ -5,9 +5,10 @@ import bcrypt from "bcrypt";
 export async function addCliente(req, res) {
   const { name, email, password } = req.body;
   const encryptedPassword = bcrypt.hashSync(password, 10);
+  console.log(encryptedPassword);
   try {
     const result = await db.query(`
-          INSERT INTO usuarios (name, email, "encryptedPassword" )
+          INSERT INTO users (name, email, password)
           VALUES ($1,$2,$3);
         `, [name, email, encryptedPassword]);
 

@@ -6,35 +6,38 @@ export async function addURL(req, res) {
   const { url } = req.body
   const { authorization } = req.headers
   const token = authorization?.replace('Bearer', '').trim()
+  console.log(token)
   const shortly = nanoid(10)
-  if (!token)
+ if (!token)
   return res.status(401).send(`erro em encontrar o token: ${token}`)
   try {
     const header = await db.query(`SELECT * 
     FROM sessions 
-    JOIN users ON sessions."userID" = users.id 
+    JOIN users ON sessions."userId" = users.id 
     WHERE token = $1`,  [token]);
     if (header.rowCount === 0) {
       return res.sendStatus(404); 
     }
+
     const result = await db.query(`
-    INSERT INTO shortlys ("userID",url,"shortUrl")
+    INSERT INTO shortlys ("userId",url,"shortlyUrl")
     VALUES($1,$2,$3);
         `, [
-          user.rows[0].id,
+          header.rows[0].id,
           url,
           shortly
         ]);
 
         res.status(201).send({ shortUrl: shortly })
   } catch (error) {
-    console.log(error)
     res.status(422).send(error)
  }
 }
 
+
 export async function getURLId(req, res) {
   const { id } = req.params;
+  console.log(id)
 
   if (isNaN(parseInt(id))) {
     return res.sendStatus(400); // bad request
@@ -52,6 +55,7 @@ export async function getURLId(req, res) {
     res.sendStatus(500); // internal server error
   }
 }
+
 
 
 export async function getURLId2(req, res) {
