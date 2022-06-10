@@ -1,6 +1,5 @@
 import joi from "joi";
 
-
 export async function sigInValidação(req, res, next) {
     const newClient = req.body;
 

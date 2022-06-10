@@ -18,8 +18,6 @@ const db = new Pool(dbconfig);
 export default db
 
 
-
-
 /*
 const db = new Pool({
   host: process.env.DB_HOST,

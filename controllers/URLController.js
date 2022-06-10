@@ -2,36 +2,35 @@ import db from "../src/bancoDeDados.js";
 import { nanoid } from 'nanoid';
 
 export async function addURL(req, res) {
-  console.log("CHEGUEI AQUI URL2");
   const { url } = req.body
   const { authorization } = req.headers
   const token = authorization?.replace('Bearer', '').trim()
-  console.log(token)
   const shortly = nanoid(10)
- if (!token)
-  return res.status(401).send(`erro em encontrar o token: ${token}`)
+  if (!token)
+    return res.status(401).send(`erro em encontrar o token: ${token}`)
   try {
     const header = await db.query(`SELECT * 
     FROM sessions 
     JOIN users ON sessions."userId" = users.id 
-    WHERE token = $1`,  [token]);
+    WHERE token = $1`, [token]);
     if (header.rowCount === 0) {
-      return res.sendStatus(404); 
+      return res.sendStatus(404);
     }
-
-    const result = await db.query(`
-    INSERT INTO shortlys ("userId",url,"shortlyUrl")
-    VALUES($1,$2,$3);
+    console.log(header.rows[0])
+    await db.query(`
+    INSERT INTO shortlys ("userId",url,"shortlyUrl","contagem")
+    VALUES($1,$2,$3,$4);
         `, [
-          header.rows[0].id,
-          url,
-          shortly
-        ]);
-
-        res.status(201).send({ shortUrl: shortly })
+      header.rows[0].userId,
+      url,
+      shortly,
+      0
+    ]);
+    console.log({ shortUrl: shortly })
+    res.status(201).send({ shortUrl: shortly })
   } catch (error) {
     res.status(422).send(error)
- }
+  }
 }
 
 
@@ -44,8 +43,9 @@ export async function getURLId(req, res) {
   }
 
   try {
-    const result = await db.query(`SELECT * FROM shortlys WHERE id = $1`, [id]);
-    if (result.rowCount === 0) {
+    const result = await db.query(`SELECT * FROM shortlys WHERE id = $1;`, [id]);
+    console.log(result.rows)
+    if (result.rows.length === 0) {
       return res.sendStatus(404); // not found
     }
 
@@ -66,8 +66,8 @@ export async function getURLIdOpen(req, res) {
     if (result.rowCount === 0) {
       return res.sendStatus(404); // not found
     }
-   contagem = result.rows[0].contagem + 1;
-   const contagemup = await db.query(`UPDATE shortlys SET contagem = ${contagem} WHERE "shortlyUrl" = $1`, [shortUrl]);
+    contagem = result.rows[0].contagem + 1;
+    const contagemup = await db.query(`UPDATE shortlys SET contagem = ${contagem} WHERE "shortlyUrl" = $1`, [shortUrl]);
     res.redirect(result.rows[0].url);
   } catch (error) {
     console.log(error);
@@ -75,30 +75,30 @@ export async function getURLIdOpen(req, res) {
   }
 }
 
-export async function deleteUrl(req, res){
+export async function deleteUrl(req, res) {
   const urlId = req.params.id
   const { authorization } = req.headers
   const token = authorization?.replace('Bearer', '').trim()
-  try{
-      const urlExiste = await db.query(`SELECT * FROM shortlys WHERE id = $1`, [urlId]); //Valida se a URL existe
-      if(urlExiste.rowCount === 0){
-          return res.sendStatus(404);
-      }
-      const owner = await db.query(`
+  try {
+    const urlExiste = await db.query(`SELECT * FROM shortlys WHERE id = $1`, [urlId]); //Valida se a URL existe
+    if (urlExiste.rowCount === 0) {
+      return res.sendStatus(404);
+    }
+    const owner = await db.query(`
           SELECT sessions.*
           FROM sessions WHERE token = $1`
       , [token])
-      const urlExists = await db.query(`
+    const urlExists = await db.query(`
           SELECT * FROM shortlys WHERE id = $1`
       , [urlId])
-      if(owner.rows[0].userId != urlExists.rows[0].userId) return res.sendStatus(401) //Valida se o usuário é o dono da URL
-      await db.query(`
+    if (owner.rows[0].userId != urlExists.rows[0].userId) return res.sendStatus(401) //Valida se o usuário é o dono da URL
+    await db.query(`
           DELETE FROM shortlys WHERE id = $1
           `
       , [urlId])
-      res.sendStatus(204) //Sucesso
-  }catch(err){
-      console.log(err)
-      res.sendStatus(500) //Erro
+    res.sendStatus(204) //Sucesso
+  } catch (err) {
+    console.log(err)
+    res.sendStatus(500) //Erro
   }
 }

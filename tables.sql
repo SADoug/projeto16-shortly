@@ -7,8 +7,6 @@ CREATE TABLE "users" (
 	"password" TEXT NOT NULL,
 	"createdAt" TIMESTAMP DEFAULT 'now()',
 	CONSTRAINT "users_pk" PRIMARY KEY ("id")
-) WITH (
-  OIDS=FALSE
 );
 
 
@@ -19,8 +17,6 @@ CREATE TABLE "sessions" (
 	"token" TEXT NOT NULL,
 	"createdAt" TIMESTAMP DEFAULT 'now()',
 	CONSTRAINT "sessions_pk" PRIMARY KEY ("id")
-) WITH (
-  OIDS=FALSE
 );
 
 
@@ -33,8 +29,6 @@ CREATE TABLE "shortlys" (
 	"contagem" bigint NOT NULL,
 	"createdAt" TIMESTAMP DEFAULT 'now()',
 	CONSTRAINT "shortlys_pk" PRIMARY KEY ("id")
-) WITH (
-  OIDS=FALSE
 );
 
 

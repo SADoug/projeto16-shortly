@@ -13,7 +13,7 @@ export async function userShortenGet(req, res) {
           JOIN users ON sessions."userId" = users.id
           WHERE token = $1
         `, [token]);
-        console.log(finduser.rows[0])
+    console.log(finduser.rows[0])
     if (finduser.rows[0].length === 0) {
       return res.sendStatus(404);
     }
@@ -24,7 +24,7 @@ export async function userShortenGet(req, res) {
         FROM shortlys
         JOIN users ON users.id = shortlys."userId"
         WHERE shortlys."userId" = $1`, [id]);
-        console.log("cheguei aqui 2")
+    console.log("cheguei aqui 2")
     /*if (result.rows[0].length === 0) {
       return res.sendStatus(404);
     }*/

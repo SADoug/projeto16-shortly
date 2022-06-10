@@ -1,6 +1,5 @@
 import joi from "joi";
 
-
 export async function novoClienteValidação(req, res, next) {
     const newClient = req.body;
 
@@ -8,13 +7,13 @@ export async function novoClienteValidação(req, res, next) {
         name: joi.string().min(1).required(),
         email: joi.string().min(1).required(),
         password: joi.string().min(1).required(),
-        confirmPassword: joi.string().required()
+        confirmPassword: joi.ref("password")
     });
     const validation = clientSchema.validate(newClient);
     if (validation.error) {
         res.status(422).send(validation.error.details);
         return;
     }
-console.log("CHEGUEI NO FINAL DO MIDDLEWARE");
+    console.log("CHEGUEI NO FINAL DO MIDDLEWARE");
     next();
 }
