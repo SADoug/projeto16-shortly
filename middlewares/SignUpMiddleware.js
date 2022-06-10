@@ -12,7 +12,7 @@ export async function novoClienteValidação(req, res, next) {
     });
     const validation = clientSchema.validate(newClient);
     if (validation.error) {
-        res.status(400).send(validation.error.details);
+        res.status(422).send(validation.error.details);
         return;
     }
 console.log("CHEGUEI NO FINAL DO MIDDLEWARE");

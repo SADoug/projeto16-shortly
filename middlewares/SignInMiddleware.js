@@ -9,6 +9,10 @@ export async function sigInValidação(req, res, next) {
         password: joi.string().min(1).required(),
     });
     const validation = clientSchema.validate(newClient);
+    if (validation.error) {
+        res.status(422).send(validation.error.details);
+        return;
+    }
 
     next();
 }
