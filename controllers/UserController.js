@@ -7,14 +7,14 @@ export async function userShortenGet(req, res) {
   console.log(token)
   if (!token) { return res.status(401).send(`erro em encontrar o token: ${token}`) }
   try {
-    const finduser = await db.query(`
+    const procurarUsuario = await db.query(`
          SELECT *
           FROM sessions
           JOIN users ON sessions."userId" = users.id
           WHERE token = $1
         `, [token]);
-    console.log(finduser.rows[0])
-    if (finduser.rows[0].length === 0) {
+    console.log(procurarUsuario.rows[0])
+    if (procurarUsuario.rows[0].length === 0) {
       return res.sendStatus(404);
     }
     console.log("chegueiaqui1")
@@ -42,8 +42,8 @@ export async function userShortenGet(req, res) {
       return shortenedUrl.push(newShort);
     });
     const infoUser = {
-      id: finduser.rows[0].id,
-      name: finduser.rows[0].name,
+      id: procurarUsuario.rows[0].id,
+      name: procurarUsuario.rows[0].name,
       visistCount: visistCount,
       shortenedUrl: shortenedUrl,
     }

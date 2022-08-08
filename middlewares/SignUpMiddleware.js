@@ -14,6 +14,6 @@ export async function novoClienteValidação(req, res, next) {
         res.status(422).send(validation.error.details);
         return;
     }
-    console.log("CHEGUEI NO FINAL DO MIDDLEWARE");
+    
     next();
 }
